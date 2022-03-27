@@ -9,7 +9,7 @@ const client = new Client({
 });
 
 const CURVE_LP_ADDRESS = `0x24699312CB27C26Cfc669459D670559E5E44EE60`;
-const TIME_INTERVAL = 10 * 60 * 1000;
+const TIME_INTERVAL = 5 * 60 * 1000;
 
 /**
  * Fetch the data for the TOR pool
