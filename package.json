@@ -1,12 +1,15 @@
 {
   "name": "tor-pool-supply-bot",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
   "author": "Ru Chern Chong <dev@ruchern.xyz>",
   "license": "MIT",
   "private": true,
   "scripts": {
-    "start": "nodemon src/index.js"
+    "start": "node build/index.js",
+    "dev": "nodemon src/index.ts",
+    "build": "rm -rf build && tsc && typedoc"
   },
   "dependencies": {
     "axios": "^0.26.1",
@@ -16,6 +19,9 @@
   },
   "devDependencies": {
     "nodemon": "^2.0.15",
-    "prettier": "^2.6.1"
+    "prettier": "^2.6.1",
+    "ts-node": "^10.7.0",
+    "typedoc": "^0.22.13",
+    "typescript": "^4.6.3"
   }
 }
