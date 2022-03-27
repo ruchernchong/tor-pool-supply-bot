@@ -1,22 +1,34 @@
-const axios = require("axios");
-const { Client, Intents } = require("discord.js");
-const ethers = require("ethers");
+import axios from "axios";
+import { Client, Intents } from "discord.js";
+import { ethers } from "ethers";
 
-require("dotenv").config();
+import "dotenv/config";
+
+export interface Coin {
+  address: string;
+  usdPrice: number;
+  decimals: string;
+  symbol: string;
+  poolBalance: bigint | string;
+}
+
+export interface CurveLP {
+  coins: Coin[];
+  usdTotal: number;
+}
 
 const client = new Client({
   intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS],
 });
 
-const CURVE_LP_ADDRESS = `0x24699312CB27C26Cfc669459D670559E5E44EE60`;
+const CURVE_LP_ADDRESS: string = `0x24699312CB27C26Cfc669459D670559E5E44EE60`;
 const TIME_INTERVAL = 5 * 60 * 1000;
 
 /**
  * Fetch the data for the TOR pool
  *
- * @return {Promise<*>}
  */
-const fetchTORPoolData = async () => {
+const fetchTORPoolData = async (): Promise<CurveLP> => {
   const { data } = await axios.get(
     `https://api.curve.fi/api/getPools/fantom/factory`
   );
@@ -26,22 +38,19 @@ const fetchTORPoolData = async () => {
 /**
  * Calculate the TOR supply based on the LP data
  *
- * @param {object} curveLpData
- * @return {Promise<void>}
  */
-const calculateTORSupply = async (curveLpData) => {
+const calculateTORSupply = async (curveLpData: CurveLP) => {
   const { coins, usdTotal } = curveLpData;
   const [TOR_DATA, DAI_USDC_DATA] = coins;
 
-  const poolBalanceTOR = ethers.utils.formatUnits(
-    TOR_DATA.poolBalance,
-    TOR_DATA.decimals
+  const poolBalanceTOR = parseInt(
+    ethers.utils.formatUnits(TOR_DATA.poolBalance, TOR_DATA.decimals)
   );
 
   const percentTORSupply = ((poolBalanceTOR / usdTotal) * 100).toFixed(2);
   console.info(
     new Date(Date.now()).toISOString(),
-    `TOR Supply:`,
+    `${TOR_DATA.symbol} Supply:`,
     percentTORSupply
   );
 
@@ -50,7 +59,7 @@ const calculateTORSupply = async (curveLpData) => {
     guild.me.setNickname(`${percentTORSupply}% ${TOR_DATA.symbol} Supply`);
   });
 
-  client.user.setPresence({
+  return client.user.setPresence({
     status: "online",
     activities: [
       {
@@ -64,7 +73,7 @@ const calculateTORSupply = async (curveLpData) => {
 client.once("ready", async () => {
   const curveLpData = {
     lpData: {},
-    set setCurveLpData(lpData) {
+    set setCurveLpData(lpData: CurveLP) {
       this.lpData = lpData;
       calculateTORSupply(lpData);
     },
@@ -77,4 +86,6 @@ client.once("ready", async () => {
   }, TIME_INTERVAL);
 });
 
-client.login(process.env.DISCORD_BOT_API_TOKEN);
+client
+  .login(process.env.DISCORD_BOT_API_TOKEN)
+  .then(() => console.log("Bot has succesfully logged in!"));
