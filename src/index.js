@@ -39,7 +39,11 @@ const calculateTORSupply = async (curveLpData) => {
   );
 
   const percentTORSupply = ((poolBalanceTOR / usdTotal) * 100).toFixed(2);
-  console.info(`TOR Supply:`, percentTORSupply);
+  console.info(
+    new Date(Date.now()).toISOString(),
+    `TOR Supply:`,
+    percentTORSupply
+  );
 
   const guilds = await client.guilds.cache;
   guilds.forEach((guild) => {
