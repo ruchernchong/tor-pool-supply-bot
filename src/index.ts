@@ -14,7 +14,7 @@ export interface Coin {
 
 export interface CurveLP {
   coins: Coin[];
-  usdTotal: number;
+  totalSupply: string;
 }
 
 const client = new Client({
@@ -40,14 +40,18 @@ const fetchTORPoolData = async (): Promise<CurveLP> => {
  *
  */
 const calculateTORSupply = async (curveLpData: CurveLP) => {
-  const { coins, usdTotal } = curveLpData;
+  const { coins, totalSupply } = curveLpData;
   const [TOR_DATA, DAI_USDC_DATA] = coins;
 
   const poolBalanceTOR = parseInt(
     ethers.utils.formatUnits(TOR_DATA.poolBalance, TOR_DATA.decimals)
   );
+  const formattedTotalSupply = parseInt(ethers.utils.formatEther(totalSupply));
 
-  const percentTORSupply = ((poolBalanceTOR / usdTotal) * 100).toFixed(2);
+  const percentTORSupply = (
+    (poolBalanceTOR / formattedTotalSupply) *
+    100
+  ).toFixed(2);
   console.info(
     new Date(Date.now()).toISOString(),
     `${TOR_DATA.symbol} Supply:`,
