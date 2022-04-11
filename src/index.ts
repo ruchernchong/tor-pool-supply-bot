@@ -92,4 +92,4 @@ client.once("ready", async () => {
 
 client
   .login(process.env.DISCORD_BOT_API_TOKEN)
-  .then(() => console.log("Bot has succesfully logged in!"));
+  .then(() => console.log("Bot has successfully logged in!"));
